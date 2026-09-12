@@ -2,6 +2,12 @@
 
 import { VFSState, createInitialVFS, resolvePath, getNode, readFile, writeFile, createDir, removeNode, moveNode, copyNode, hasPermission } from './vfs';
 import { VirtualNetwork, createNetwork, findHost, resolveToIp, findWebServer, findWebPage, checkCredentials, findDnsRecords, findWhois, findVulnParam, randomInt } from './network';
+import {
+  cmdNmap, cmdHydra, cmdGobuster, cmdSqlmap, cmdCurl, cmdWget, cmdNc,
+  cmdPing, cmdDig, cmdNslookup, cmdWhois, cmdTraceroute, cmdIfconfig,
+  cmdPs, cmdKill, cmdSudo, cmdFind, cmdLocate, cmdTar, cmdGzip,
+  cmdBase64, cmdHash, cmdCrontab, cmdAt, cmdSsh, cmdFtp
+} from './commands/offensive';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -721,18 +727,18 @@ A star (*) next to a name means that the command is disabled.
  bg [job_spec ...]                       mapfile [-d delim] [-n count] [-O or>
  bind [-lpsvPSVX] [-m keymap] [-f file>  popd [-n] [+N | -N]
  break [n]                               printf [-v var] format [arguments]
- builtin [shell-builtin [arg ...]]       pushd [-n] [+N | -N | dir]
+ builtin [shell-builtin [arg ...]        pushd [-n] [+N | -N | dir]
  caller [expr]                           pwd [-LPW]
  case WORD in [PATTERN [| PATTERN]...)>  read [-ers] [-a array] [-d delim] [->
  cd [-L|[-P [-e]] [-@]] [dir]            readarray [-n count] [-O origin] [-s>
- command [-pVv] command [arg ...]        readonly [-aAf] [name[=value] ...] o>
+ command [-pVv] command [arg ...]        readonly [-aAfF] [name[=value] ...] o>
  compgen [-abcdefgjksuv] [-o option] [>  return [n]
  complete [-abcdefgjksuv] [-pr] [-DEI]>  select NAME [in WORDS ... ;] do COMM>
  compopt [-o] [-D] [-I] [-E] [-n name]>  set [-abefhkmnptuvxBCHP] [-o option->
  continue [n]                            shift [n]
- coproc [NAME] command [redirections]    shopt [-pqsu] [-o] [optname ...]
- declare [-aAfFgiIlnrtux] [-p] [name[=>  source filename [arguments]
- dirs [-clpv] [+N] [-N]                  suspend [-f]
+ coproc [NAME] command [redirections]    shopt [-pqs] [-o optname ...]
+ declare [-aAfFgiIlnrtux] [-p [name[=>  source filename [arguments]
+ dirs [-clpv] [+N | -N]                  suspend [-f]
  disown [-h] [-ar] [jobspec ... | pid >  test [expr]
  echo [-neE] [arg ...]                   time [-p] pipeline
  enable [-a] [-dnps] [-f filename] [na>  times
@@ -742,7 +748,7 @@ A star (*) next to a name means that the command is disabled.
  export [-fn] [name[=value] ...] or ex>  typeset [-aAfFgiIlnrtux] [-p] name[=>
  false                                   ulimit [-SHabcdefiklmnpqrstuvxPT] [l>
  fc [-e ename] [-lnr] [first] [last] o>  umask [-p] [-S] [mode]
- fg [job_spec]                           unalias [-a] name [name ...]
+ fg [job_spec]                          unalias [-a] name [name ...]
  for NAME [in WORDS ... ] ; do COMMAND>  unset [-f] [-v] [-n] [name ...]
  for (( exp1; exp2; exp3 )); do COMMAN>  until COMMANDS; do COMMANDS; done
  function name { COMMANDS ; } or name >  variables - Names and meanings of so>

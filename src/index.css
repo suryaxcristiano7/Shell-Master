@@ -1,0 +1,26 @@
+/* Base styles for ShellStrike Academy */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: #07090d;
+  color: #e2e8f0;
+  font-family: system-ui, sans-serif;
+}
+
+.xterm {
+  padding: 12px;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  background: #1a2334;
+  border-radius: 4px;
+}
