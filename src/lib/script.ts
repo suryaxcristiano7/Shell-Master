@@ -214,7 +214,7 @@ async function substitute(line: string, state: ShellState, args: string[]): Prom
   // Positional parameters: $1..$9, $#, $@
   out = out.replace(/\$(\d)/g, (_, d) => args[parseInt(d) - 1] ?? '');
   out = out.replace(/\$#/g, String(args.length));
-  out = out.replace(/\$@/g, args.join(' ');
+  out = out.replace(/\$@/g, args.join(' '));
 
   // Named variables: ${VAR} and $VAR
   out = out.replace(/\$\{(\w+)\}/g, (_, v) => varValue(v, state));
