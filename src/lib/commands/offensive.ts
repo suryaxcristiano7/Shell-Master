@@ -18,7 +18,7 @@ function ensureDir(state: ShellState, absPath: string): void {
   }
 }
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /** Get an option value: either attached (-pPASS) or as the next argument (-p PASS). */
 function opt(args: string[], ...flags: string[]): string | undefined {
@@ -113,7 +113,7 @@ export function cmdNmap(args: string[], state: ShellState): CommandResult {
   return { output, exitCode: 0 };
 }
 
-// â”€â”€â”€ Hydra Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Hydra Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Simulated wordlists that exist "inside" rockyou.txt-style files
 const SIM_USERS = ['admin', 'root', 'tomcat', 'jdoe', 'ftpuser', 'app', 'hacker'];
@@ -191,7 +191,7 @@ export function cmdHydra(args: string[], state: ShellState): CommandResult {
   return { output, exitCode: found ? 0 : 1 };
 }
 
-// â”€â”€â”€ Gobuster Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Gobuster Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function cmdGobuster(args: string[], state: ShellState): CommandResult {
   const urlArg = opt(args, '-u') || (args.find(a => a.startsWith('-u'))?.slice(2));
@@ -208,7 +208,7 @@ export function cmdGobuster(args: string[], state: ShellState): CommandResult {
   const server = findWebServer(state.network, ip, port);
   if (!server) return { output: `Error: Could not connect to ${urlArg}\n`, exitCode: 1 };
 
-  let output = `================================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Tim Morgan (@b0rn2run)\n===============================================================\n`;
+  let output = `===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Tim Morgan (@b0rn2run)\n===============================================================\n`;
   output += `[+] Url         : ${urlArg}\n`;
   output += `[+] Method      : GET\n`;
   output += `[+] Threads     : 10\n`;
@@ -224,12 +224,464 @@ export function cmdGobuster(args: string[], state: ShellState): CommandResult {
       const status = page.statusCode;
       const size = page.contentLength;
       const color = status >= 200 && status < 300 ? '\x1b[32m' : status >= 300 && status < 400 ? '\x1b[33m' : '\x1b[31m';
-      output += `${color}/${path.padEnd(20)} (Status: ${status}) [Size: ${size}]\x1b[0m\n`;;
+      output += `${color}/${path.padEnd(20)} (Status: ${status}) [Size: ${size}]\x1b[0m\n`;
     }
   }
 
-  output += `================================================================\nFinished\n===============================================================\n`;
+  output += `===============================================================\nFinished\n===============================================================\n`;
   return { output, exitCode: 0 };
 }
 
-// â”€â”€â”€ Sqlmap Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€()•áÁ½ÉÐ™Õ¹Ñ¥½¸µ‘MÅ±µ…À¡…ÉÌèÍÑÉ¥¹mt°ÍÑ…Ñ”èM¡•±±MÑ…Ñ”¤è½µµ…¹‘I•ÍÕ±Ðì(€½¹ÍÐÕÉ±Éœ€ô½ÁÐ¡…ÉÌ°€œµÔœ¤ñð€¡…ÉÌ¹™¥¹¡„€ôø„¹ÍÑ…ÉÑÍ]¥Ñ  œµÔœ¤¤ü¹Í±¥” È¤¤ñð€œœì(€½¹ÍÐÁ…É…µÉœ€ô½ÁÐ¡…ÉÌ°€œ´µ‘…Ñ„œ¤ñð€¡…ÉÌ¹™¥¹¡„€ôø„¹¥¹±Õ‘•Ì œôœ¤¤ü¹ÍÁ±¥Ð œôœ¥lÁt¤ì€¼¼I½Õ Á…ÉÍ¥¹œ(€€(€¥˜€ …ÕÉ±Éœ¤É•ÑÕÉ¸ì½ÕÑÁÕÐè€ÕÍ…”èÍÅ±µ…À€µÔUI0m½ÁÑ¥½¹Íuq¸œ°•á¥Ñ½‘”è€Äôì((€€¼¼M¥µÁ±”¡•ÕÉ¥ÍÑ¥Œè¡•¬¥˜UI0µ…Ñ¡•Ì½ÕÈÙÕ±¸Á…É…µÌ(€½¹ÍÐÙÕ±¸€ôÍÑ…Ñ”¹¹•ÑÝ½É¬¹ÙÕ±¹A…É…µÌ¹™¥¹¡Ø€ôøÕÉ±Éœ¹¥¹±Õ‘•Ì¡Ø¹ÕÉ°¤ñðØ¹ÕÉ°¹¥¹±Õ‘•Ì¡ÕÉ±Éœ¤¤ì(€€(€±•Ð½ÕÑÁÕÐ€ôl©tÍÑ…ÉÑ¥¹œ €ÄÀèÀÀèÀÀ€¼ÈÀÈØ´Àä´ÄÌ½q¹q¹€ì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÅtm%9=tÑ•ÍÑ¥¹œ½¹¹•Ñ¥½¸Ñ¼Ñ¡”Ñ…É•ÐUI1q¹€ì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÉtm%9=t¡•­¥¹œ¥˜Ñ¡”Ñ…É•Ð¥ÌÁÉ½Ñ•Ñ•‰äÍ½µ”]¸¸¹q¹€ì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÍtm%9=t¡ÕÉ¥ÍÑ¥Ì‘•Ñ•Ñ•Ý•ˆÁ…”¥Ì€Á…¡”q¹€ì((€¥˜€ …ÙÕ±¸ñð€…ÙÕ±¸¹ÙÕ±¹•É…‰±”¤ì(€€€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÕtm]I9%9tPÁ…É…µ•Ñ•È€œ‘íÁ…É…µÉœñð€¥ôœ‘½•Ì¹½ÐÍ••´Ñ¼‰”¥¹©•Ñ…‰±•q¹€ìì(€€€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÙtmI%Q%1t…±°Ñ•ÍÑ•Á…É…µ•Ñ•ÉÌ‘¼¹½Ð…ÁÁ•…ÈÑ¼‰”¥¹©•Ñ…‰±”¹q¹€ìì(€€€É•ÑÕÉ¸ì½ÕÑÁÕÐ°•á¥Ñ½‘”è€Àôì(€ô((€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÕtm%9=tÑ•ÍÑ¥¹œ€9‰½½±•…¸µ‰…Í•‰±¥¹€´]!I½È!Y%9±…ÕÍ”q¹€ì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÙtm%9=tPÁ…É…µ•Ñ•È€œ‘íÙÕ±¸¹Á…É…µôœ…ÁÁ•…ÉÌÑ¼‰”€9‰½½±•…¸µ‰…Í•‰±¥¹€´]!I½È!Y%9±…ÕÍ”œ¥¹©•Ñ…‰±”q¹€ì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀÝtm%9=tÑ•ÍÑ¥¹œ€5åME0€øô€Ô¸À9•ÉÉ½Èµ‰…Í•€´]!I°!Y%9°=IH	d½ÈI=U@	d±…ÕÍ”€¡1==H¤q¹€ìì(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÀátm%9=tPÁ…É…µ•Ñ•È€œ‘íÙÕ±¸¹Á…É…µôœ¥Ì€5åME0€øô€Ô¸À9•ÉÉ½Èµ‰…Í•€´]!I°!Y%9°=IH	d½ÈI=U@	d±…ÕÍ”€¡1==H¤œ¥¹©•Ñ…‰±”q¹€ìì(€€(€½ÕÑÁÕÐ€¬ôq¸´´µq¹A…É…µ•Ñ•Èè€‘íÙÕ±¸¹Á…É…µô€¡P¥q¸€€€QåÁ”è‰½½±•…¸µ‰…Í•‰±¥¹‘q¸€€€Q¥Ñ±”è9‰½½±•…¸µ‰…Í•‰±¥¹€´]!I½È!Y%9±…ÕÍ•q¸€€€A…å±½…è¥ôÄœ9€ÔàÈäôÔàÈä9€„œô…q¹q¹€ìì(€€(€½ÕÑÁÕÐ€¬ôlÄÀèÀÀèÄÁtm%9=tÑ¡”‰…¬µ•¹	5L¥Ì5åME1q¹€ìì(€½ÕÑÁÕÐ€¬ôÝ•ˆ…ÁÁ±¥…Ñ¥½¸Ñ•¡¹½±½äèA!@€à¸Ä¸È°Á…¡”€È¸Ð¸ÔÑq¹€ì(€½ÕÑÁÕÐ€¬ô‰…¬µ•¹	5Lè5åME0€øô€Ô¸Áq¹€ì(€½ÕÑÁÕÐ€¬ô…Ù…¥±…‰±”‘…Ñ…‰…Í•Ìl‘íÙÕ±¸¹‘‰Ìü¹±•¹Ñ €üü€Éõtéq¹€ì(€™½È€¡½¹ÍÐ½˜ÙÕ±¸¹‘‰Ì€üümt¤½ÕÑÁÕÐ€¬ôl©t€‘í‘õq¹€ì(€½ÕÑÁÕÐ€¬ôl©t•¹‘¥¹œ €ÄÀèÀÀèÄÔ€¼ÈÀÈØ´Àä´ÄÌ½q¹€ìì((€É•ÑÕÉ¸ì½ÕÑÁÕÐ°•á¥Ñ½‘”è€Àôì)ô((¼¼ƒŠRŠRŠR ÕÉ°M¥µÕ±…Ñ½ÈƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR ()•áÁ½ÉÐ™Õ¹Ñ¥½¸µ‘ÕÉ°¡…ÉÌèÍÑÉ¥¹mt°ÍÑ…Ñ”èM¡•±±MÑ…Ñ”¤è½µµ…¹‘I•ÍÕ±Ðì(€½¹ÍÐÕÉ±Éœ€ô…ÉÌ¹™¥¹¡„€ôø€…„¹ÍÑ…ÉÑÍ]¥Ñ  œ´œ¤¤ñð€œœìì(€¥˜€ …ÕÉ±Éœ¤É•ÑÕÉ¸ì½ÕÑÁÕÐè€ÕÉ°èÑÉäpÕÉ°€´µ¡•±Ápœ™½Èµ½É”¥¹™½Éµ…Ñ¥½¹q¸œ°•á¥Ñ½‘”è€Äôì((€€¼¼A…ÉÍ”UI0(€±•Ð¥À€ô€œœì(€±•ÐÁ½ÉÐ€ô€àÀì(€±•ÐÁ…Ñ €ô€œ¼œì(€€(€€¼¼!…¹‘±”¡ÑÑÀè¼½%@éA=IP½Á…Ñ (€½¹ÍÐÕÉ±5…Ñ €ôÕÉ±Éœ¹µ…Ñ  ½¡ÑÑÁmÍtüép½p¼¡mq¹t¬¤ üèè¡q¬¤¤ü¡p¼¸¨¤ü¼¤ì(€¥˜€¡ÕÉ±5…Ñ ¤ì(€€€¥À€ôÕÉ±5…Ñ¡lÅtì(€€€Á½ÉÐ€ôÕÉ±5…Ñ¡lÉt€üÁ…ÉÍ•%¹Ð¡ÕÉ±5…Ñ¡lÉt¤€è€àÀì(€€€Á…Ñ €ôÕÉ±5…Ñ¡lÍtñð€œ¼œì(€ô•±Í”ì(€€€€¼¼ÍÍÕµ”¥ÐÌ…¸%@(€€€¥À€ôÕÉ±Éœì(€ô((€½¹ÍÐÁ…”€ô™¥¹‘]•‰A…”¡ÍÑ…Ñ”¹¹•ÑÝ½É¬°¥À°Á½ÉÐ°Á…Ñ ¤ì(€¥˜€ …Á…”¤ì(€€€É•ÑÕÉ¸ì½ÕÑÁÕÐèÕÉ°è€ Ü¤…¥±•Ñ¼½¹¹•ÐÑ¼€‘í¥ÁôÁ½ÉÐ€‘íÁ½ÉÑôè½¹¹•Ñ¥½¸É•™ÕÍ•‘q¹€°•á¥Ñ½‘”è€Üôì(€ô((€±•Ð½ÕÑÁÕÐ€ô€œœì(€¥˜€¡…ÉÌ¹¥¹±Õ‘•Ì œµ¤œ¤ñð…ÉÌ¹¥¹±Õ‘•Ì œµ$œ¤¤ì(€€€€¼¼!•…‘•ÉÌ(€€€½ÕÑÁÕÐ€¬ô!QQ@¼Ä¸Ä€‘íÁ…”¹ÍÑ…ÑÕÍ½‘•ô=-q¹€ì(€€€½ÕÑÁÕÐ€¬ôM•ÉÙ•Èè€‘í™¥¹‘]•‰M•ÉÙ•È¡ÍÑ…Ñ”¹¹•ÑÝ½É¬°¥À°Á½ÉÐ¤ü¹Í•ÉÙ•É!•…‘•Èñð€Á…¡”õq¹€ì(€€€½ÕÑÁÕÐ€¬ô½¹Ñ•¹ÐµQåÁ”è€‘íÁ…”¹½¹Ñ•¹ÑQåÁ•õq¹€ìì(€€€½ÕÑÁÕÐ€¬ô½¹Ñ•¹Ðµ1•¹Ñ è€‘íÁ…”¹½¹Ñ•¹Ñ1•¹Ñ¡õq¹€ì(€€€=‰©•Ð¹•¹ÑÉ¥•Ì¡Á…”¹¡•…‘•ÉÌ¤¹™½É…  ¡m¬°Ùt¤€ôø½ÕÑÁÕÐ€¬ô€‘í­ôè€‘íÙõq¹€¤ìì(€€€½ÕÑÁÕÐ€¬ôq¹€ìì(€ô(€€(€¥˜€ ……ÉÌ¹¥¹±Õ‘•Ì œµ$œ¤¤ì(€€€½ÕÑÁÕÐ€¬ôÁ…”¹‰½‘äì(€ô((€É•ÑÕÉ¸ì½ÕÑÁÕÐ°•á¥Ñ½‘”è€Àôì)ô((¼¼ƒŠRŠRŠR ]•ÐM¥µÕ±…Ñ½ÈƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR ()•áÁ½ÉÐ™Õ¹Ñ¥½¸µ‘]ÕÐ¡…ÉÌèÍÑÉ¥¹mt°ÍÑ…Ñ”èM¡•±±MÑ…Ñ”¤è½µµ…¹‘I•ÍÕ±Ðì(€½¹ÍÐÕÉ±Éœ€ô…ÉÌ¹™¥¹¡„€ôø€…„¹ÍÑ…ÉÑÍ]¥Ñ  œ¼œ¤¤ñð€œœìì(€¥˜€ …ÕÉ±Éœ¤É•ÑÕÉ¸ì½ÕÑÁÕÐè€Ý•Ðèµ¥ÍÍ¥¹œUI1q¸œ°•á¥Ñ½‘”è€Äôì((€€¼¼I•ÕÍ”ÕÉ°±½¥ŒÑ¼•Ð½¹Ñ•¹Ð(€½¹ÍÐÕÉ±I•Ì€ôµ‘ÕÉ°¡mÕÉ±Ét°ÍÑ…Ñ”¤ìì(€¥˜€¡ÕÉ±I•Ì¹•á¥Ñ½‘”€„ôô€À¤É•ÑÕÉ¸ÕÉ±I•Ìì((€€¼¼•Ñ•Éµ¥¹”™¥±•¹…µ”(€½¹ÍÐ™¥±•¹…µ”€ôÕÉ±Éœ¹ÍÁ±¥Ð œ¼œ¤¹Á½À ¤ñð€¥¹‘•à¹¡Ñµ°œìì(€½¹ÍÐ…‰ÍA…Ñ €ôÉ•Í½±Ù•A…Ñ ¡ÍÑ…Ñ”¹Ù™Ì¹Ý°™¥±•¹…µ”°ÍÑ…Ñ”¹Ù™Ì¹¡½µ”¤ì(€€(€ÝÉ¥Ñ•¥±”¡ÍÑ…Ñ”¹Ù™Ì°…‰ÍA…Ñ °ÕÉ±I•Ì¹½ÕÑÁÕÐ¤ì(€€(€É•ÑÕÉ¸ì½ÕÑÁÕÐè€´´ÈÀÈØ´Àä´ÄÌ€ÄÀèÀÀèÀÀ´´€€‘íÕÉ±Éõq¹½¹¹•Ñ¥¹œÑ¼€‘íÕÉ±Éô¸¸¸½¹¹•Ñ•¹q¹!QQ@É•ÅÕ•ÍÐÍ•¹Ð°…Ý…¥Ñ¥¹œÉ•ÍÁ½¹Í”¸¸¸€ÈÀÀ=-q¹1•¹Ñ è€‘íÕÉ±I•Ì¹½ÕÑÁÕÐ¹±•¹Ñ¡ômÑ•áÐ½¡Ñµ±uq¹M…Ù¥¹œÑ¼èƒŠ`‘í™¥±•¹…µ•÷Šeq¹q»Š`‘í™¥±•¹…µ•÷ŠdÍ…Ù•l‘íÕÉ±I•Ì¹½ÕÑÁÕÐ¹±•¹Ñ¡ô¼‘íÕÉ±I•Ì¹½ÕÑÁÕÐ¹±•¹Ñ¡õuq¹€°•á¥Ñ½‘”è€Àôì)ô((¼¼ƒŠRŠRŠR 9•Ñ…ÐM¥µÕ±…Ñ½ÈƒŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠRŠR ()•áÁ½ÉÐ™Õ¹Ñ¥½¸µ‘9Œ¡…ÉÌèÍÑÉ¥¹mt°ÍÑ…Ñ”èM¡•±±MÑ…Ñ”°ÍÑ‘¥¸èÍÑÉ¥¹œ¤è½µµ…¹‘I•ÍÕ±Ðì(€€¼¼	•ÑÑ•ÈÁ½ÉÐ™¥¹‘¥¹œèÕÍÕ…±±äÑ¡”Í•½¹¹½¸µ™±…œ…Éœ(€½¹ÍÐ¹½¹±…Ì€ô…ÉÌ¹™¥±Ñ•È¡„€ôø€…„¹ÍÑ…ÉÑÍ]¥Ñ  œ´œ¤¤ì(€½¹ÍÐÑ…É•Ð€ô¹½¹±…ÍlÁtì(€½¹ÍÐÁ½ÉÐ€ô¹½¹±…ÍlÅt€üÁ…ÉÍ•%¹Ð¡¹½¹±…ÍlÅt¤€è¹Õ±°ì((€¥˜€ …Ñ…É•Ðñð€…Á½ÉÐ¤É•ÑÕÉ¸ì½ÕÑÁÕÐè€¹Œè¥¹Ù…±¥ÕÍ…•q¸œ°•á¥Ñ½‘”è€Äôì((€½¹ÍÐ¥À€ôÉ•Í½±Ù•Q½%À¡ÍÑ…Ñ”¹¹•ÑÝ½É¬°Ñ…É•Ð¤ì(€¥˜€ …¥À¤É•ÑÕÉ¸ì½ÕÑÁÕÐè¹Œè•Ñ…‘‘É¥¹™¼è9…µ”½ÈÍ•ÉÙ¥”¹½Ð­¹½Ý¹q¹€°•á¥Ñ½‘”è€Äôì((€½¹ÍÐ¡½ÍÐ€ô™¥¹‘!½ÍÐ¡ÍÑ…Ñ”¹¹•ÑÝ½É¬°¥À¤ì(€½¹ÍÐ½Á•¹A½ÉÐ€ô¡½ÍÐü¹Á½ÉÑÌ¹™¥¹¡À€ôøÀ¹Á½ÉÐ€ôôôÁ½ÉÐ€˜˜À¹ÍÑ…Ñ”€ôôô€½Á•¸œ¤ì((€¥˜€ …½Á•¹A½ÉÐ¤ì(€€€É•ÑÕÉ¸ì½ÕÑÁÕÐè¹Œè½¹¹•ÐÑ¼€‘í¥ÁôÁ½ÉÐ€‘íÁ½ÉÑô€¡ÑÀ¤™…¥±•è½¹¹•Ñ¥½¸É•™ÕÍ•‘q¹€°•á¥Ñ½‘”è€Äôì(€ô((€€¼¼%˜±¥ÍÑ•¹¥¹œµ½‘”€ µ°¤°Í¥µÕ±…Ñ”„‰…¹¹•È½È•¡¼(€¥˜€¡…ÉÌ¹¥¹±Õ‘•Ì œµ°œ¤¤ì(€€€É•ÑÕÉ¸ì½ÕÑÁÕÐè€‘í½Á•¹A½ÉÐ¹‰…¹¹•Èñð€œô‘íÍÑ‘¥¹õ€°•á¥Ñ½‘”è€Àôì(€ô((€€¼¼%˜½¹¹•Ñ¥¹œ°Í¡½Ü‰…¹¹•È¥˜…Ù…¥±…‰±”(€É•ÑÕÉ¸ì½ÕÑÁÕÐè€‘í½Á•¹A½ÉÐ¹‰…¹¹•Èñð€œõ€°•á¥Ñ½‘”è€Àôì)ô(
+// â”€â”€â”€ Sqlmap Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdSqlmap(args: string[], state: ShellState): CommandResult {
+  const urlArg = opt(args, '-u') || (args.find(a => a.startsWith('-u'))?.slice(2)) || '';
+  const paramArg = opt(args, '--data') || (args.find(a => a.includes('='))?.split('=')[0]); // Rough parsing
+  
+  if (!urlArg) return { output: 'usage: sqlmap -u URL [options]\n', exitCode: 1 };
+
+  // Simple heuristic: check if URL matches our vuln params
+  const vuln = state.network.vulnParams.find(v => urlArg.includes(v.url) || v.url.includes(urlArg));
+  
+  let output = `[*] starting @ 10:00:00 /2026-09-13/\n\n`;
+  output += `[10:00:01] [INFO] testing connection to the target URL\n`;
+  output += `[10:00:02] [INFO] checking if the target is protected by some WAF...\n`;
+  output += `[10:00:03] [INFO] heuristics detected web page is 'Apache'\n`;
+
+  if (!vuln || !vuln.vulnerable) {
+    output += `[10:00:05] [WARNING] GET parameter '${paramArg || 'id'}' does not seem to be injectable\n`;
+    output += `[10:00:06] [CRITICAL] all tested parameters do not appear to be injectable.\n`;
+    return { output, exitCode: 0 };
+  }
+
+  output += `[10:00:05] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'\n`;
+  output += `[10:00:06] [INFO] GET parameter '${vuln.param}' appears to be 'AND boolean-based blind - WHERE or HAVING clause' injectable \n`;
+  output += `[10:00:07] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)'\n`;
+  output += `[10:00:08] [INFO] GET parameter '${vuln.param}' is 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)' injectable \n`;
+  
+  output += `\n---\nParameter: ${vuln.param} (GET)\n    Type: boolean-based blind\n    Title: AND boolean-based blind - WHERE or HAVING clause\n    Payload: id=1' AND 5829=5829 AND 'a'='a\n\n`;
+  
+  output += `[10:00:10] [INFO] the back-end DBMS is MySQL\n`;
+  output += `web application technology: PHP 8.1.2, Apache 2.4.54\n`;
+  output += `back-end DBMS: MySQL >= 5.0\n`;
+  output += `available databases [${vuln.dbs?.length ?? 2}]:\n`;
+  for (const d of vuln.dbs ?? []) output += `[*] ${d}\n`;
+  output += `[*] ending @ 10:00:15 /2026-09-13/\n`;
+
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Curl Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdCurl(args: string[], state: ShellState): CommandResult {
+  const urlArg = args.find(a => !a.startsWith('-')) || '';
+  if (!urlArg) return { output: 'curl: try \'curl --help\' for more information\n', exitCode: 1 };
+
+  // Parse URL
+  let ip = '';
+  let port = 80;
+  let path = '/';
+  
+  // Handle http://IP:PORT/path
+  const urlMatch = urlArg.match(/http[s]?:\/\/(\d.\d.\d.\d)(?::(\d+))?(\/.*)?/);
+  if (urlMatch) {
+    ip = urlMatch[1];
+    port = urlMatch[2] ? parseInt(urlMatch[2]) : 80;
+    path = urlMatch[3] || '/';
+  } else {
+    // Assume it's an IP
+    ip = urlArg;
+  }
+
+  const page = findWebPage(state.network, ip, port, path);
+  if (!page) {
+    return { output: `curl: (7) Failed to connect to ${ip} port ${port}: Connection refused\n`, exitCode: 7 };
+  }
+
+  let output = '';
+  if (args.includes('-i') || args.includes('-I')) {
+    // Headers
+    output += `HTTP/1.1 ${page.statusCode} OK\n`;
+    output += `Server: ${findWebServer(state.network, ip, port)?.serverHeader || 'Apache'}\n`;
+    output += `Content-Type: ${page.contentType}\n`;
+    output += `Content-Length: ${page.contentLength}\n`;
+    Object.entries(page.headers).forEach(([k, v]) => output += `${k}: ${v}\n`);
+    output += `\n`;
+  }
+  
+  if (!args.includes('-I')) {
+    output += page.body;
+  }
+
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Wget Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdWget(args: string[], state: ShellState): CommandResult {
+  const urlArg = args.find(a => !a.startsWith('-')) || '';
+  if (!urlArg) return { output: 'wget: missing URL\n', exitCode: 1 };
+
+  // Reuse curl logic to get content
+  const curlRes = cmdCurl([urlArg], state);
+  if (curlRes.exitCode !== 0) return curlRes;
+
+  // Determine filename
+  const filename = urlArg.split('/').pop() || 'index.html';
+  const absPath = resolvePath(state.vfs.cwd, filename, state.vfs.home);
+  
+  writeFile(state.vfs, absPath, curlRes.output);
+  
+  return { output: `--2026-09-13 10:00:00--  ${urlArg}\nConnecting to ${urlArg}... connected.\nHTTP request sent, awaiting response... 200 OK\nLength: ${curlRes.output.length} [text/html]\nSaving to: â€˜${filename}â€™\n\nâ€˜${filename}â€™ saved [${curlRes.output.length}/${curlRes.output.length}]\n`, exitCode: 0 };
+}
+
+// â”€â”€â”€ Netcat Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdNc(args: string[], state: ShellState, stdin: string): CommandResult {
+  // Better port finding: usually the second non-flag arg
+  const nonFlags = args.filter(a => !a.startsWith('-'));
+  const target = nonFlags[0];
+  const port = nonFlags[1] ? parseInt(nonFlags[1]) : null;
+
+  if (!target || !port) return { output: 'nc: invalid usage\n', exitCode: 1 };
+
+  const ip = resolveToIp(state.network, target);
+  if (!ip) return { output: `nc: getaddrinfo: Name or service not known\n`, exitCode: 1 };
+
+  const host = findHost(state.network, ip);
+  const openPort = host?.ports.find(p => p.port === port && p.state === 'open');
+
+  if (!openPort) {
+    return { output: `nc: connect to ${ip} port ${port} (tcp) failed: Connection refused\n`, exitCode: 1 };
+  }
+
+  // If listening mode (-l), simulate a banner or echo
+  if (args.includes('-l')) {
+    return { output: `${openPort.banner || ''}${stdin}`, exitCode: 0 };
+  }
+
+  // If connecting, show banner if available
+  return { output: `${openPort.banner || ''}`, exitCode: 0 };
+}
+
+// â”€â”€â”€ Ping Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdPing(args: string[], state: ShellState): CommandResult {
+  const target = args.find(a => !a.startsWith('-')) || '';
+  if (!target) return { output: 'ping: usage error: Destination address required\n', exitCode: 1 };
+
+  const ip = resolveToIp(state.network, target);
+  if (!ip) return { output: `ping: ${target}: Name or service not known\n`, exitCode: 1 };
+
+  const host = findHost(state.network, ip);
+  if (!host || !host.isUp) {
+    return { output: `PING ${target} (${ip}) 56(84) bytes of data.\nFrom ${state.vfs.cwd} icmp_seq=1 Destination Host Unreachable\n`, exitCode: 1 };
+  }
+
+  let output = `PING ${target} (${ip}) 56(84) bytes of data.\n`;
+  for (let i = 1; i <= 4; i++) {
+    const time = randomInt(1, 50);
+    output += `64 bytes from ${ip}: icmp_seq=${i} ttl=${host.ttl} time=${time}.${randomInt(1, 9)} ms\n`;
+  }
+  output += `\n--- ${target} ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3004ms\n`;
+  
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Dig/Nslookup Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdDig(args: string[], state: ShellState): CommandResult {
+  const domain = args.find(a => !a.startsWith('-')) || 'corp.local';
+  const type = args.find(a => ['A', 'AAAA', 'MX', 'NS', 'TXT', 'SOA'].includes(a.toUpperCase()))?.toUpperCase() || 'A';
+
+  const records = findDnsRecords(state.network, domain, type);
+  
+  let output = `; <<>> DiG 9.18.19-1~deb12u1-Debian <<>> ${domain} ${type}\n;; global options: +cmdsubnets\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: ${randomInt(1000, 9999)}\n;; flags: qr rd ra; QUERY: 1, ANSWER: ${records.length}, AUTHORITY: 2, ADDITIONAL: 1\n\n;; QUESTION SECTION:\n;${domain}.\t\t\tIN\t${type}\n\n;; ANSWER SECTION:\n`;
+  
+  if (records.length === 0) {
+    output += `;; AUTHORITY SECTION:\ncorp.local.\t\t3600\tIN\tSOA\tdc01.corp.local. admin.corp.local. 2026091301 3600 900 604800 86400\n`;
+  } else {
+    records.forEach(r => {
+      output += `${r.name}.\t\t${r.ttl}\tIN\t${r.type}\t${r.value}\n`;
+    });
+  }
+  
+  output += `\n;; Query time: ${randomInt(1, 10)} msec\n;; SERVER: 10.10.10.10#53(10.10.10.10) (UDP)\n;; WHEN: Sun Sep 13 10:00:00 UTC 2026\n;; MSG SIZE  rcvd: ${randomInt(50, 200)}\n`;
+
+  return { output, exitCode: 0 };
+}
+
+export function cmdNslookup(args: string[], state: ShellState): CommandResult {
+  const domain = args[0] || 'corp.local';
+  const records = findDnsRecords(state.network, domain, 'A');
+  
+  let output = `Server:\t\t10.10.10.10\nAddress:\t10.10.10.10#53\n\nNon-authoritative answer:\n`;
+  if (records.length > 0) {
+    records.forEach(r => {
+      output += `Name:\t${r.name}\nAddress: ${r.value}\n`;
+    });
+  } else {
+    output += `*** Can't find ${domain}: No answer\n`;
+  }
+  
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Whois Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdWhois(args: string[], state: ShellState): CommandResult {
+  const domain = args[0] || 'corp.local';
+  const data = findWhois(state.network, domain);
+  
+  if (!data) return { output: `Whois lookup failed for ${domain}\n`, exitCode: 1 };
+
+  let output = `Domain Name: ${data.domain}\nRegistry Domain ID: \nRegistrar WHOIS Server: whois.internal.registrar\nRegistrar URL: http://www.internal.registrar\nUpdated Date: 2026-01-01T00:00:00Z\nCreation Date: ${data.creationDate}\nRegistry Expiry Date: ${data.expiryDate}\nRegistrar Registration Expiration Date: \nRegistrar: ${data.registrar}\nRegistrar IANA ID: 9999\nRegistrar Abuse Contact Email: abuse@internal.registrar\nRegistrar Abuse Contact Phone: +1.5555555555\nDomain Status: ${data.status.join('\nDomain Status: ')}\nRegistry Registrant ID: \nRegistrant Name: ${data.registrant}\nRegistrant Organization: ${data.registrant}\nRegistrant Street: \nRegistrant City: \nRegistrant State/Province: \nRegistrant Postal Code: \nRegistrant Country: US\nRegistrant Phone: \nRegistrant Email: \nName Server: ${data.nameServers.join('\nName Server: ')}\nDNSSEC: unsigned\n`;
+  
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Traceroute Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdTraceroute(args: string[], state: ShellState): CommandResult {
+  const target = args[0] || '8.8.8.8';
+  const ip = resolveToIp(state.network, target) || '8.8.8.8';
+  
+  let output = `traceroute to ${target} (${ip}), 30 hops max, 60 byte packets\n`;
+  const hops = [
+    '192.168.1.1',
+    '10.0.0.1',
+    '172.16.0.1',
+    ip
+  ];
+  
+  hops.forEach((hop, i) => {
+    const time1 = randomInt(1, 20);
+    const time2 = randomInt(1, 20);
+    const time3 = randomInt(1, 20);
+    output += ` ${i+1}  ${hop} (${hop})  ${time1}.${randomInt(1,9)} ms  ${time2}.${randomInt(1,9)} ms  ${time3}.${randomInt(1,9)} ms\n`;
+  });
+  
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Ifconfig/IP Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdIfconfig(args: string[], state: ShellState): CommandResult {
+  let output = `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255\n        inet6 fe80::a00:27ff:fe4e:66a1  prefixlen 64  scopeid 0x20<link>\n        ether 08:00:27:4e:66:a1  txqueuelen 1000  (Ethernet)\n        RX packets 12345  bytes 6789012 (6.4 MiB)\n        RX errors 0  dropped 0  overruns 0  frame 0\n        TX packets 6789  bytes 1234567 (1.1 MiB)\n        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0\n\nlo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536\n        inet 127.0.0.1  netmask 255.0.0.0\n        inet6 ::1  prefixlen 128  scopeid 0x10<host>\n        loopback  txqueuelen 1000  (Local Loopback)\n        RX packets 100  bytes 10000 (9.7 KiB)\n        RX errors 0  dropped 0  overruns 0  frame 0\n        TX packets 100  bytes 10000 (9.7 KiB)\n        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0\n`;
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Ps/Kill Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdPs(state: ShellState): CommandResult {
+  let output = `  PID TTY          TIME CMD\n    1 ?        00:00:01 systemd\n  420 ?        00:00:00 sshd\n  421 pts/0    00:00:00 bash\n  422 pts/0    00:00:00 ps\n`;
+  return { output, exitCode: 0 };
+}
+
+export function cmdKill(args: string[], state: ShellState): CommandResult {
+  return { output: '', exitCode: 0 }; // Silent success
+}
+
+// â”€â”€â”€ Sudo Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Note: 'sudo' itself is handled specially inside shell.ts (it re-runs the
+// command as root). This old implementation is kept only for compatibility.
+
+export function cmdSudo(args: string[], state: ShellState, stdin: string): CommandResult {
+  const cmd = args[0];
+  if (cmd === 'bash') {
+    state.vfs.user = 'root';
+    return { output: 'root@shellstrike:/home/hacker# ', exitCode: 0 };
+  }
+  return { output: `sudo: ${cmd}: command not found\n`, exitCode: 1 };
+}
+
+// â”€â”€â”€ SSH Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdSsh(args: string[], state: ShellState): CommandResult {
+  const target = args.filter(a => !a.startsWith('-')).pop() || '';
+  if (!target) return { output: 'usage: ssh [-p port] [user@]host\n', exitCode: 1 };
+
+  const m = target.match(/^([^@]+)@(.+)$/);
+  const user = m ? m[1] : state.vfs.user;
+  const host = m ? m[2] : target;
+
+  const ip = resolveToIp(state.network, host);
+  if (!ip) return { output: `ssh: Could not resolve hostname ${host}: Name or service not known\n`, exitCode: 255 };
+
+  const hostEntry = findHost(state.network, ip);
+  const sshPort = hostEntry?.ports.find(p => p.port === 22 && p.state === 'open');
+  if (!sshPort) return { output: `ssh: connect to host ${ip} port 22: Connection refused\n`, exitCode: 255 };
+
+  const endpoint = state.network.loginEndpoints.find(e => e.hostIp === ip && e.port === 22 && e.protocol === 'ssh');
+  const userValid = endpoint?.validCreds.some(c => c.user === user);
+  if (!userValid) return { output: `${user}@${ip}: Permission denied (publickey,password).\n`, exitCode: 255 };
+
+  // Valid username â€” a password is required. Use: sshpass -p <pass> ssh user@host
+  return { output: `${user}@${ip}'s password: \nPermission denied, please try again.\n${user}@${ip}: Permission denied (publickey,password).\nHint: non-interactive password auth is done with sshpass -p <password> ssh user@host\n`, exitCode: 255 };
+}
+
+export function cmdSshpass(args: string[], state: ShellState): CommandResult {
+  // sshpass -p PASS ssh [user@]host
+  const pass = opt(args, '-p') || '';
+  const sshIdx = args.indexOf('ssh');
+  if (sshIdx === -1 || !pass) return { output: 'Usage: sshpass -p <password> ssh [user@]host\n', exitCode: 1 };
+
+  const target = args[sshIdx + 1] || '';
+  const m = target.match(/^([^@]+)@(.+)$/);
+  const user = m ? m[1] : state.vfs.user;
+  const host = m ? m[2] : target;
+
+  const ip = resolveToIp(state.network, host);
+  if (!ip) return { output: `ssh: Could not resolve hostname ${host}\n`, exitCode: 255 };
+
+  const hostEntry = findHost(state.network, ip);
+  const sshPort = hostEntry?.ports.find(p => p.port === 22 && p.state === 'open');
+  if (!sshPort) return { output: `ssh: connect to host ${ip} port 22: Connection refused\n`, exitCode: 255 };
+
+  const res = checkCredentials(state.network, ip, 22, 'ssh', user, pass);
+  if (!res.success) {
+    return { output: `${user}@${ip}'s password: \n${res.message}\n`, exitCode: 255 };
+  }
+  return { output: `${user}@${ip}'s password: \nWelcome to ${hostEntry?.hostname || ip}!\nLast login: Sun Sep 13 09:41:03 2026 from 192.168.1.100\n`, exitCode: 0 };
+}
+
+// â”€â”€â”€ Find/Locate Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdFind(args: string[], state: ShellState): CommandResult {
+  const path = args[0] || '.';
+  const nameFlagIndex = args.indexOf('-name');
+  const pattern = nameFlagIndex !== -1 ? args[nameFlagIndex + 1].replace(/["']/g, '') : '*';
+  
+  // Very simplified recursive search
+  let output = '';
+  if (pattern.includes('passwd')) output += '/etc/passwd\n';
+  if (pattern.includes('shadow')) output += '/etc/shadow\n';
+  if (pattern.includes('.ssh')) output += '/home/hacker/.ssh\n/home/hacker/.ssh/id_rsa\n';
+  if (pattern.includes('flag')) output += '/home/hacker/flag.txt\n/root/flag.txt\n';
+  if (pattern === '*' || pattern === '*.*' || !pattern) output += `${path}\n${path}/..\n`;
+  
+  return { output, exitCode: 0 };
+}
+
+export function cmdLocate(args: string[], state: ShellState): CommandResult {
+  const pattern = args[0] || '';
+  let output = '';
+  if (pattern.includes('nmap')) output += '/usr/bin/nmap\n/usr/share/nmap\n';
+  if (pattern.includes('hydra')) output += '/usr/bin/hydra\n';
+  if (pattern.includes('wordlist')) output += '/usr/share/wordlists/rockyou.txt\n';
+  return { output, exitCode: 0 };
+}
+
+// â”€â”€â”€ Archive/Compression Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdTar(args: string[], state: ShellState): CommandResult {
+  // Supported: tar -czf|-cvf|-cf ARCHIVE FILES...   tar -tf ARCHIVE   tar -xzf ARCHIVE
+  const fIdx = args.findIndex(a => /^-[a-zA-Z]*f/.test(a));
+  if (fIdx === -1) return { output: 'tar: option requires an argument -- \'f\'\nTry \'tar --help\' for more information.\n', exitCode: 1 };
+
+  const mode = args[fIdx];
+  const archive = args[fIdx + 1];
+  const files = args.slice(fIdx + 2);
+  const archivePath = resolvePath(state.vfs.cwd, archive || '', state.vfs.home);
+
+  if (!archive) return { output: 'tar: missing archive name\n', exitCode: 1 };
+
+  if (mode.includes('c')) {
+    if (files.length === 0) return { output: 'tar: You must specify files to archive\n', exitCode: 1 };
+    const parts: string[] = [];
+    for (const f of files) {
+      const fp = resolvePath(state.vfs.cwd, f, state.vfs.home);
+      const c = readFile(state.vfs, fp);
+      if (c === null) return { output: `tar: ${f}: Cannot stat: No such file or directory\n`, exitCode: 2 };
+      parts.push(`# ${f}\n${c}`);
+    }
+    const content = `[TARBALL ${archive}]\n` + parts.join('\n\n') + '\n';
+    writeFile(state.vfs, archivePath, content);
+    return { output: `tar: creating ${archive} with ${files.length} file(s)\n`, exitCode: 0 };
+  }
+
+  const content = readFile(state.vfs, archivePath);
+  if (content === null) return { output: `tar: ${archive}: Cannot open: No such file or directory\n`, exitCode: 2 };
+
+  if (mode.includes('t')) {
+    const names = content.split('\n').filter(l => l.startsWith('# ')).map(l => l.slice(2));
+    return { output: names.join('\n') + '\n', exitCode: 0 };
+  }
+  if (mode.includes('x')) {
+    return { output: `tar: extracting ${archive}...\n`, exitCode: 0 };
+  }
+  return { output: `tar: unknown mode\n`, exitCode: 1 };
+}
+
+export function cmdGzip(args: string[], state: ShellState): CommandResult {
+  return { output: '', exitCode: 0 };
+}
+
+// â”€â”€â”€ Encoding/Hashing Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdBase64(args: string[], state: ShellState, stdin: string): CommandResult {
+  const decode = args.includes('-d');
+  if (decode) {
+    try {
+      return { output: atob(stdin.trim()), exitCode: 0 };
+    } catch (e) {
+      return { output: 'base64: invalid input\n', exitCode: 1 };
+    }
+  }
+  return { output: btoa(stdin.trim()) + '\n', exitCode: 0 };
+}
+
+export function cmdHash(args: string[], state: ShellState, stdin: string): CommandResult {
+  // Mock hash
+  return { output: `${stdin.trim()}  -\n`, exitCode: 0 };
+}
+
+// â”€â”€â”€ Cron/At Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdCrontab(args: string[], state: ShellState): CommandResult {
+  const cronPath = `/var/spool/cron/crontabs/${state.vfs.user}`;
+
+  if (args.includes('-l')) {
+    const content = readFile(state.vfs, cronPath);
+    if (content === null) return { output: `no crontab for ${state.vfs.user}\n`, exitCode: 1 };
+    return { output: content + '\n', exitCode: 0 };
+  }
+  if (args.includes('-e')) {
+    return { output: 'crontab: no interactive editor in the simulator â€” create a cron file and run: crontab <file>\n', exitCode: 1 };
+  }
+  const file = args.find(a => !a.startsWith('-'));
+  if (file) {
+    const content = readFile(state.vfs, resolvePath(state.vfs.cwd, file, state.vfs.home));
+    if (content === null) return { output: `crontab: ${file}: No such file or directory\n`, exitCode: 1 };
+    ensureDir(state, '/var/spool/cron/crontabs');
+    writeFile(state.vfs, cronPath, content);
+    return { output: '', exitCode: 0 };
+  }
+  return { output: 'usage: crontab [-l | <file>]\n', exitCode: 1 };
+}
+
+export function cmdAt(args: string[], state: ShellState): CommandResult {
+  return { output: 'warning: commands will be executed using /bin/sh\njob 1 at Sun Sep 13 11:00:00 2026\n', exitCode: 0 };
+}
+
+// â”€â”€â”€ FTP Simulator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function cmdFtp(args: string[], state: ShellState): CommandResult {
+  const target = args.filter(a => !a.startsWith('-')).pop() || '';
+  const m = target.match(/^([^@]+)@(.+)$/);
+  const user = m ? m[1] : 'anonymous';
+  const host = m ? m[2] : target;
+
+  const ip = resolveToIp(state.network, host);
+  if (!ip) return { output: `ftp: ${host}: Name or service not known\n`, exitCode: 2 };
+
+  const hostEntry = findHost(state.network, ip);
+  const ftpPort = hostEntry?.ports.find(p => p.port === 21 && p.state === 'open');
+  if (!ftpPort) return { output: `ftp: connect: Connection refused\n`, exitCode: 2 };
+
+  const res = checkCredentials(state.network, ip, 21, 'ftp', user, '');
+  if (res.success) {
+    return { output: `Connected to ${ip}.\n220 (vsFTPd 3.0.3)\nName (${ip}:hacker): ${user}\n331 Please specify the password.\n230 Login successful.\nftp> `, exitCode: 0 };
+  }
+  return { output: `Connected to ${ip}.\n220 (vsFTPd 3.0.3)\nName (${ip}:hacker): ${user}\n331 Please specify the password.\n530 Permission denied.\nftp> `, exitCode: 0 };
+}
