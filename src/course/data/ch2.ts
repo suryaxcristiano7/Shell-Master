@@ -112,7 +112,7 @@ grep root /etc/passwd
 grep -i "failed" auth.log     # -i: case-insensitive
 grep -c "Failed" auth.log     # -c: just COUNT matching lines
 grep -n "root" /etc/passwd   # -n: show line numbers
-grep -v "sshd" auth.log     # -v: INFET� - lines that DON'T match
+grep -v "sshd" auth.log      # -v: INVERT — lines that DON'T match
 \`\`\`
 
 ## Your first attacker analysis
@@ -134,17 +134,17 @@ grep "Failed password for \(invalid user \)\?admin" auth.log   # optional text
 grep "^Sep 13 03" auth.log     # lines starting with "Sep 13 03"
 \`\`\`
 
-> The regex rabbit hole is deep — anchors (~ start, $ end), classes ([0-9]), repetition (* + ?). You already know enough to hunt.`,
+> The regex rabbit hole is deep — anchors (^ start, $ end), classes ([0-9]), repetition (* + ?). You already know enough to hunt.`,
       practice: {
         prompt: 'Someone attacked this machine. Count how many "Failed password" events are in /var/log/auth.log (grep with the -c flag).',
-        hints: ['`grep -c "Failed password" /var/log/auth.log`', 'Quote the pattern - it contains a space.'],
-        check: ctx => ranRe(/^grep\s+-c\s+"Failed password"\s+\/var\/log\/auth\.log/)(ctx) && outputHas('13')(ctx)
+        hints: ['`grep -c "Failed password" /var/log/auth.log`', 'Quote the pattern — it contains a space.'],
+        check: ctx => ranRe(/^grep\s+-c\s+"Failed password"\s+\/var\/log\/auth\.log/)(ctx) && outputHas('13')(ctx),
       },
       quiz: [
-        { q: 'What does `grep -c "x" file` output?', options: ['The matching lines', 'The number of matching lines', 'The file count', 'Line numbers'], answer: 1, explanation: '-c suppresses the lines and prints only the count.' },
+        { q: 'What does `grep -c "x" file` output?', options: ['The matching lines', 'The number of matching lines', 'The file count', 'Line numbers'], answer: 1, explanation: '-c suppresses the line and prints only the count.' },
         { q: 'Which flag makes grep case-insensitive?', options: ['-v', '-i', '-n', '-a'], answer: 1, explanation: '-i = ignore case.' },
         { q: 'What does `grep -v sshd auth.log` show?', options: ['Only sshd lines', 'Lines that do NOT contain sshd', 'Verbose output', 'Version info'], answer: 1, explanation: '-v inverts the match.' },
-        { q: 'In regex, what does ^ mean at the start of a pattern?', options: ['Exponent', 'Match start of line', 'Negation', 'Any character'], answer: 1, explanation: '^ anchors the pattern to the beginning of the line.' },
+        { q: 'In regex, what does ^ mean at the start of a pattern?', options: ['Exponent', 'Match start of line', 'Negation', 'Any character'], answer: 1, explanition: '^ anchors the pattern to the beginning of the line.' },
       ],
     },
     {
@@ -200,7 +200,7 @@ Read that chain right-to-left in your head: filter → slice → sort → count.
         { q: 'Why must you sort before uniq?', options: ['For speed', 'uniq only merges adjacent duplicate lines', 'sort deletes duplicates', 'No reason'], answer: 1, explanation: 'uniq collapses only neighbouring identical lines, so sorting first groups them.' },
         { q: 'What does `cut -d: -f1 /etc/passwd` print?', options: ['The password hashes', 'The usernames', 'The first line', 'The UID field'], answer: 1, explanation: 'Split each line on : and keep field 1 = username.' },
         { q: 'What does `sort | uniq -c` produce?', options: ['A random list', 'Unique lines with their counts', 'Sorted numbers', 'Compressed output'], answer: 1, explanation: 'Counts occurrences of every distinct line.' },
-        { q: 'What does `echo hi | tr a-z A-Z` print?', options: ['hi', 'HI', 'Hi', 'hI'], answer: 1, explanation: 'tr maps each character in set a-z to its partner in A-Z.' },
+        { q: 'What does `echo hi | tr a-z A-Z` print?', options: ['hi', 'HI', 'Hi', 'hI'], answer: 1, explanition: 'tr maps each character in set a-z to its partner in A-Z.' },
       ],
     },
   ],
