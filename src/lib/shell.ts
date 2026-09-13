@@ -6,8 +6,9 @@ import {
   cmdNmap, cmdHydra, cmdGobuster, cmdSqlmap, cmdCurl, cmdWget, cmdNc,
   cmdPing, cmdDig, cmdNslookup, cmdWhois, cmdTraceroute, cmdIfconfig,
   cmdPs, cmdKill, cmdSudo, cmdFind, cmdLocate, cmdTar, cmdGzip,
-  cmdBase64, cmdHash, cmdCrontab, cmdAt, cmdSsh, cmdFtp
+  cmdBase64, cmdHash, cmdCrontab, cmdAt, cmdSsh, cmdSshpass, cmdFtp
 } from './commands/offensive';
+import { runBashScript } from './script';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -174,9 +175,40 @@ function tokenize(input: string): { commands: ParsedCommand[] } {
 
 // ─── Command Execution Engine ───────────────────────────────────────────────
 
+/** Split an input line into statements on ';' (respecting quotes). */
+function splitStatements(input: string): string[] {
+  const out: string[] = [];
+  let cur = '';
+  let inQuote = false;
+  let quoteChar = '';
+  for (const ch of input) {
+    if (!inQuote && (ch === '"' || ch === "'") ) { inQuote = true; quoteChar = ch; cur += ch; continue; }
+    if (inQuote && ch === quoteChar) { inQuote = false; cur += ch; continue; }
+    if (!inQuote && ch === ';') { out.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  if (cur.trim()) out.push(cur);
+  return out;
+}
+
 export async function executeCommand(input: string, state: ShellState): Promise<CommandResult> {
   const trimmed = input.trim();
   if (!trimmed) return { output: '', exitCode: 0 };
+
+  // Multiple statements separated by ';'
+  if (trimmed.includes(';')) {
+    const stmts = splitStatements(trimmed);
+    if (stmts.length > 1) {
+      let output = '';
+      let exitCode = 0;
+      for (const s of stmts) {
+        const r = await executeCommand(s, state);
+        output += r.output;
+        exitCode = r.exitCode;
+      }
+      return { output, exitCode };
+    }
+  }
 
   // Add to history
   state.history.push(trimmed);
@@ -246,6 +278,13 @@ async function runSingleCommand(
   
   const { cmd: name, args } = cmd;
 
+  // --- Variable assignment: NAME=value ---
+  const assign = name.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+  if (assign) {
+    state.env[assign[1]] = assign[2].replace(/^["']|["']$/g, '');
+    return { output: '', exitCode: 0 };
+  }
+
   // --- Built-in Commands (JS Implementation) ---
   switch (name) {
     case 'cd': return cmdCd(args, state);
@@ -277,6 +316,9 @@ async function runSingleCommand(
     case 'export': return cmdExport(args, state);
     case 'clear': return { output: '\x1b[2J\x1b[H', exitCode: 0 }; // ANSI clear screen
     case 'history': return cmdHistory(state);
+    case 'true': return { output: '', exitCode: 0 };
+    case 'false': return { output: '', exitCode: 1 };
+    case 'printf': return cmdPrintf(args, state);
     case 'which': return cmdWhich(args, state);
     case 'type': return cmdType(args, state);
     case 'help': return cmdHelp();
@@ -301,7 +343,23 @@ async function runSingleCommand(
     case 'ip': return cmdIfconfig(args, state);
     case 'ps': return cmdPs(state);
     case 'kill': return cmdKill(args, state);
-    case 'sudo': return cmdSudo(args, state, stdin);
+    case 'ssh': return cmdSsh(args, state);
+    case 'sshpass': return cmdSshpass(args, state);
+    case 'ftp': return cmdFtp(args, state);
+    
+    // --- sudo: run a command as root (special handling) ---
+    case 'sudo': {
+      if (args.length === 0) return { output: 'usage: sudo <command>\n', exitCode: 1 };
+      if (args[0] === 'bash' || args[0] === 'su' || args[0] === '-i') {
+        state.vfs.user = 'root';
+        return { output: '[sudo] password for hacker: \nroot@shellstrike:~# \n', exitCode: 0 };
+      }
+      const prevUser = state.vfs.user;
+      state.vfs.user = 'root';
+      const res = await runSingleCommand({ cmd: args[0], args: args.slice(1), redirects: [] }, state, stdin);
+      state.vfs.user = prevUser;
+      return res;
+    }
     case 'find': return cmdFind(args, state);
     case 'locate': return cmdLocate(args, state);
     case 'tar': return cmdTar(args, state);
@@ -311,8 +369,6 @@ async function runSingleCommand(
     case 'sha256sum': return cmdHash(args, state, stdin);
     case 'crontab': return cmdCrontab(args, state);
     case 'at': return cmdAt(args, state);
-    case 'ssh': return cmdSsh(args, state);
-    case 'ftp': return cmdFtp(args, state);
     
     default:
       // Check if it's a script in PATH (simulated)
@@ -423,8 +479,20 @@ function cmdCat(args: string[], state: ShellState, stdin: string): CommandResult
 function cmdEcho(args: string[], state: ShellState): CommandResult {
   // Basic variable expansion
   let text = args.join(' ');
-  // Expand $VAR
-  text = text.replace(/\$(\w+)/g, (_, varName) => state.env[varName] || '');
+  // Exit code of the last command
+  text = text.replace(/\$\?/g, String(state.exitCode));
+  // $(( arithmetic ))
+  text = text.replace(/\$\(\(([\d\s+\-*/%().A-Za-z_]+?)\)\)/g, (_, expr) => {
+    const expanded = expr.replace(/([A-Za-z_]\w*)/g, (w) => state.env[w] !== undefined ? String(state.env[w]) : w);
+    if (!/^[\d\s+\-*/%().]*$/.test(expanded)) return _;
+    try { return String(Function(`"use strict"; return (${expanded});`)()); } catch { return _; }
+  });
+  // Expand $VAR (PWD and HOME are tracked specially)
+  text = text.replace(/\$(\w+)/g, (_, varName) =>
+    varName === 'PWD' ? state.vfs.cwd :
+    varName === 'HOME' ? state.vfs.home :
+    varName === 'USER' ? state.vfs.user :
+    (state.env[varName] || ''));
   // Expand ~
   text = text.replace(/~/g, state.vfs.home);
   
@@ -451,10 +519,25 @@ function cmdMkdir(args: string[], state: ShellState): CommandResult {
   
   for (const target of targets) {
     const absPath = resolve(target, state);
-    if (!createDir(state.vfs, absPath)) {
-       // Simple error handling for now
-       // In a real impl, we'd check if parent exists for non-recursive
-       return { output: `mkdir: cannot create directory '${target}': File exists\n`, exitCode: 1 };
+    if (!recursive) {
+      if (!createDir(state.vfs, absPath)) {
+        return { output: `mkdir: cannot create directory '${target}': File exists\n`, exitCode: 1 };
+      }
+    } else {
+      // Create every missing path segment progressively
+      const parts = absPath.split('/').filter(Boolean);
+      let cur = '';
+      for (const part of parts) {
+        cur += '/' + part;
+        const node = getNode(state.vfs, cur);
+        if (!node) {
+          if (!createDir(state.vfs, cur)) {
+            return { output: `mkdir: cannot create directory '${cur}'\n`, exitCode: 1 };
+          }
+        } else if (node.type !== 'dir') {
+          return { output: `mkdir: cannot create directory '${cur}': File exists\n`, exitCode: 1 };
+        }
+      }
     }
   }
   return { output: '', exitCode: 0 };
@@ -564,7 +647,7 @@ function cmdWc(args: string[], state: ShellState, stdin: string): CommandResult 
 
 function cmdGrep(args: string[], state: ShellState, stdin: string): CommandResult {
   if (args.length === 0) return { output: 'Usage: grep PATTERN [FILE...]\n', exitCode: 1 };
-  const pattern = args[0];
+  const pattern = args.find(a => !a.startsWith('-')) || args[0];
   const ignoreCase = args.includes('-i');
   const invert = args.includes('-v');
   const count = args.includes('-c');
@@ -703,9 +786,43 @@ function cmdWhich(args: string[], state: ShellState): CommandResult {
 function cmdType(args: string[], state: ShellState): CommandResult {
   if (args.length === 0) return { output: 'usage: type [-afptP] name ...\n', exitCode: 1 };
   const name = args[0];
-  const builtins = ['cd', 'pwd', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'chmod', 'chown', 'head', 'tail', 'wc', 'grep', 'sort', 'uniq', 'cut', 'tr', 'whoami', 'id', 'uname', 'hostname', 'date', 'env', 'export', 'clear', 'history', 'which', 'type', 'help', 'man', 'exit'];
+  const builtins = ['cd', 'pwd', 'ls', 'cat', 'echo', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'chmod', 'chown', 'head', 'tail', 'wc', 'grep', 'sort', 'uniq', 'cut', 'tr', 'whoami', 'id', 'uname', 'hostname', 'date', 'env', 'export', 'clear', 'history', 'which', 'type', 'help', 'man', 'exit', 'printf'];
   if (builtins.includes(name)) return { output: `${name} is a shell builtin\n`, exitCode: 0 };
   return { output: `${name} is /usr/bin/${name}\n`, exitCode: 0 };
+}
+
+// --- printf (minimal but useful) ---
+
+function cmdPrintf(args: string[], state: ShellState): CommandResult {
+  if (args.length === 0) return { output: 'usage: printf format [arguments...]\n', exitCode: 1 };
+  let fmt = args[0];
+  const rest = args.slice(1);
+
+  // NOTE: like real single-quoted printf formats, we do NOT expand $variables here —
+  // that is what makes printf ideal for writing script files containing $1, $VAR etc.
+
+  // Interpret common escapes
+  fmt = fmt
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .replace(/\\\\/g, '\\')
+    .replace(/\\'/g, "'")
+    .replace(/\\"/g, '"');
+
+  // Very small %s / %d / %x placeholder substitution
+  let out = '';
+  let argIdx = 0;
+  for (let i = 0; i < fmt.length; i++) {
+    if (fmt[i] === '%' && i + 1 < fmt.length) {
+      const spec = fmt[i + 1];
+      if (spec === 's') { out += rest[argIdx++] ?? ''; i++; continue; }
+      if (spec === 'd') { out += String(parseInt(rest[argIdx++] ?? '0') || 0); i++; continue; }
+      if (spec === 'x') { out += (parseInt(rest[argIdx++] ?? '0') || 0).toString(16); i++; continue; }
+      if (spec === '%') { out += '%'; i++; continue; }
+    }
+    out += fmt[i];
+  }
+  return { output: out, exitCode: 0 };
 }
 
 function cmdHelp(): CommandResult {
@@ -763,16 +880,19 @@ function cmdMan(args: string[], state: ShellState): CommandResult {
   return { output: `No manual entry for ${args[0]}\n`, exitCode: 1 };
 }
 
-// ─── Script Runner (Simulated) ──────────────────────────────────────────────
+// ─── Script Runner (real mini-interpreter) ─────────────────────────────────
 
 async function runScript(name: string, args: string[], state: ShellState, stdin: string): Promise<CommandResult> {
   const absPath = resolve(name, state);
   const content = readFile(state.vfs, absPath);
   if (!content) return { output: `bash: ${name}: No such file or directory\n`, exitCode: 127 };
-  
-  // Very naive script runner: just echo that it ran
-  // In a real app, you'd parse bash syntax here or use a library like bashjs
-  return { output: `[+] Running script ${name}...\n[+] Done.\n`, exitCode: 0 };
+
+  // Python scripts are not executed (no python interpreter in the simulator)
+  if (name.endsWith('.py')) {
+    return { output: `[+] Running script ${name}...\n[+] Done.\n`, exitCode: 0 };
+  }
+
+  return runBashScript(content, args, state);
 }
 
 // ─── Export for React Component ─────────────────────────────────────────────
