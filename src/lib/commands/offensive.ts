@@ -283,7 +283,7 @@ export function cmdCurl(args: string[], state: ShellState): CommandResult {
   let path = '/';
   
   // Handle http://IP:PORT/path
-  const urlMatch = urlArg.match(/http[s]?:\/\/(\d.\d.\d.\d)(?::(\d+))?(\/.*)?/);
+  const urlMatch = urlArg.match(/http[s]?:\/\/([\d.]+)(?::(\d+))?(\/.*)?/);
   if (urlMatch) {
     ip = urlMatch[1];
     port = urlMatch[2] ? parseInt(urlMatch[2]) : 80;
